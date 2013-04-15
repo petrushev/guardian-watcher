@@ -26,7 +26,7 @@ def fetch_rss(rss):
         date_, time_ = stamp.split('T')
         time_ = time_.split('Z')[0]
         yield (date_, time_,
-               item.cssselect("title")[0].text_content(),
+               item.cssselect("title")[0].text_content().split('|')[0],
                item.cssselect("guid" )[0].text)
 
 def fetch_all(rsslist, saved = None):
@@ -85,7 +85,7 @@ def gen_html(data):
       <span>
         %s
         <a href="%s" target="article" >%s</a>
-      </span>""" % (time_[:5], url, escape(title, True))
+      </span>""" % (time_[:5], url, escape(title.split('|')[0], True))
 
             for tag in tags:
                 html = html + """
