@@ -1,3 +1,56 @@
+    </div>
+
+    <div id="tags">
+      <h3>Tags</h3>
+      <a href="#" id="filter_all" style="font-weight:bold;">all</a>
+    </div>
+
   </div>
+
+  <script>
+    var tags = [];
+    var tags_box = $("div#tags");
+    $.each($("span.rssname"), function(id, obj) {
+      var tag = $(obj).text();
+      if ($.inArray(tag, tags)===-1) {
+        tags.push(tag);
+        tags_box.append('<div><a href="#" id="filter_'+tag+'" >'+tag+'</a></div>');
+      }
+    });
+    $("a[id^=filter_]").click(function() {
+      $("a[id^=filter_]").css("font-weight", "normal");
+      $(this).css("font-weight", "bold");
+
+      var tag = $(this).attr("id").replace("filter_", "");
+      $("div.daily").show();
+      if (tag=="all") {
+        $("div.article").show();
+
+      } else {
+        $.each($("div.article"), function(id, div) {
+           div = $(div);
+           var spans = div.find("span.rssname");
+           div.hide();
+           $.each(spans, function(id, span) {
+             if ($(span).text()==tag) {
+               div.show();
+             }
+           });
+        });
+
+        $.each($("div.daily"), function(id, div) {
+          div = $(div);
+          var articles = div.find("div.article:visible");
+          console.debug(articles);
+          if (articles.length == 0) {
+            div.hide();
+          }
+
+        });
+
+      }
+
+    });
+  </script>
 </body>
 </html>

@@ -2,15 +2,19 @@ import requests
 from lxml.html import fromstring, tostring
 from sys import argv
 from datetime import datetime
-import json
 from operator import itemgetter
 from werkzeug.utils import escape
 
 def load_rss_list(list_path):
     """Load list of rss urls from a file"""
+    list_ = []
     with open(list_path, 'r') as f:
-        return [line.split('|')[1].strip()
-                for line in f]
+        for line in f:
+            rss_name, rss = line.split('|')
+            rss_name = rss_name.strip()
+            rss = rss.strip()
+            list_.append((rss_name, rss))
+    return list_
 
 def fetch_rss(rss):
     """Fetch and parse a given rss"""
@@ -32,12 +36,18 @@ def fetch_all(rsslist, saved = None):
     else:
         data = saved
 
-    for rss in rsslist:
+    for rss_name, rss in rsslist:
         for date_, time_, title, url in fetch_rss(rss):
             if date_ not in data:
                 data[date_] = {}
 
-            data[date_][url] = (time_, title)
+            if url in data[date_]:
+                tags = data[date_][url][2] #saved tags
+                if rss_name not in tags: tags.append(rss_name)
+            else:
+                tags = [rss_name]
+
+            data[date_][url] = (time_, title, tags)
 
     return data
 
@@ -61,32 +71,31 @@ def gen_html(data):
         else:
             date = date.strftime('%d %B, %Y')
 
-        if start_div:
-            html = html + """
-<div class="fullblock">"""
-
         html = html + """
   <div class="daily" >
     <h3>%s</h3>""" % date
 
-        items = [(time_, title, url)
-                 for url, (time_, title) in items.iteritems()]
+        items = [(time_, title, url, tags)
+                 for url, (time_, title, tags) in items.iteritems()]
         items.sort(key=itemgetter(0), reverse=True)
 
-        for time_, title, url in items:
+        for time_, title, url, tags in items:
             html = html + """
     <div class="article">
       <span>
         %s
         <a href="%s" target="article" >%s</a>
-      </span>
-    </div>""" % (time_[:5], url, escape(title, True))
+      </span>""" % (time_[:5], url, escape(title, True))
+
+            for tag in tags:
+                html = html + """
+      <span class="hidden rssname">%s</span> """ % tag
+
+            html = html + """
+    </div>"""
 
         html = html + """
   </div>"""
-
-        if not start_div: html = html + """
-</div>"""
 
         start_div = not start_div
 
