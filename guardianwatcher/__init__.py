@@ -28,30 +28,30 @@ def fetch_rss(rss):
 def fetch_all(rsslist, saved = None):
     """Fetch all rss feeds in list, and update the `saved` data"""
     if saved is None:
-        dates = {}
+        data = {}
     else:
-        dates = saved
+        data = saved
 
     for rss in rsslist:
         for date_, time_, title, url in fetch_rss(rss):
-            if date_ not in dates:
-                dates[date_] = {}
+            if date_ not in data:
+                data[date_] = {}
 
-            dates[date_][url] = (time_, title)
+            data[date_][url] = (time_, title)
 
-    return dates
+    return data
 
-def gen_html(dates):
+def gen_html(data):
     """Generate partial html table from saved data"""
-    dates = dates.items()
-    dates.sort(key=itemgetter(0), reverse=True)
+    data = data.items()
+    data.sort(key=itemgetter(0), reverse=True)
 
     html = ""
 
     today = datetime.utcnow().date()
 
     start_div = True
-    for date, items in dates:
+    for date, items in data:
         date = datetime.strptime(date, '%Y-%m-%d').date()
         diffdate = today - date
         if diffdate.days == 0:

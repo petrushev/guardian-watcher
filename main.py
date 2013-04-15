@@ -20,17 +20,17 @@ def main():
         saved = {}
 
     # fetch updates
-    dates = fetch_all(rsslist, saved=saved)
+    data = fetch_all(rsslist, saved=saved)
 
     # save cache
     with open(saved_cache, 'w') as f:
-        f.write(json.dumps(dates))
+        f.write(json.dumps(data))
 
     with open(PROJECTPATH + '/static/header.html', 'r') as f:
         target_html.write(f.read())
 
     # generate html
-    html = gen_html(dates)
+    html = gen_html(data)
     target_html.write(html.encode('utf-8'))
 
     with open(PROJECTPATH + '/static/footer.html', 'r') as f:
