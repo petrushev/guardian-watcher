@@ -19,8 +19,8 @@ def fetch_rss(rss):
     items = doc.cssselect("channel item")
     for item in items:
         stamp = item.cssselect('date')[0].text
-        date_ = stamp.split('T')[0]
-        time_ = stamp.split('T')[1].split('Z')[0]
+        date_, time_ = stamp.split('T')
+        time_ = time_.split('Z')[0]
         yield (date_, time_,
                item.cssselect("title")[0].text_content(),
                item.cssselect("guid" )[0].text)
@@ -62,27 +62,31 @@ def gen_html(data):
             date = date.strftime('%d %B, %Y')
 
         if start_div:
-            html = html + """<div class="fullblock">"""
+            html = html + """
+<div class="fullblock">"""
 
         html = html + """
-<div class="daily" >
-  <h3>%s</h3>""" % date
+  <div class="daily" >
+    <h3>%s</h3>""" % date
+
         items = [(time_, title, url)
                  for url, (time_, title) in items.iteritems()]
         items.sort(key=itemgetter(0), reverse=True)
+
         for time_, title, url in items:
             html = html + """
-  <div class="article">
-    <span>
-      %s
-      <a href="%s" target="article" >%s</a>
-    </span>
-  </div>""" % (time_[:5], url, escape(title, True))
+    <div class="article">
+      <span>
+        %s
+        <a href="%s" target="article" >%s</a>
+      </span>
+    </div>""" % (time_[:5], url, escape(title, True))
 
         html = html + """
-</div>"""
+  </div>"""
 
-        if not start_div: html = html + "</div>"
+        if not start_div: html = html + """
+</div>"""
 
         start_div = not start_div
 
