@@ -84,8 +84,8 @@ def gen_html(data):
     <div class="article">
       <span>
         %s
-        <a href="%s" target="_blank" >%s</a>
-      </span>""" % (time_[:5], url, escape(title.split('|')[0], True))
+        <a href="%s" target="_blank" title="%s" >%s</a>
+      </span>""" % (time_[:5], url, ', '.join(tags), escape(title.split('|')[0], True))
 
             for tag in tags:
                 html = html + """
