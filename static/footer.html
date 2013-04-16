@@ -10,6 +10,9 @@
   <script>
     var tags = [];
     var tags_box = $("div#tags");
+    var dailies = $("div.daily");
+    var articles = $("div.article");
+
     $.each($("span.rssname"), function(id, obj) {
       var tag = $(obj).text();
       if ($.inArray(tag, tags)===-1) {
@@ -17,17 +20,22 @@
         tags_box.append('<div><a href="#" id="filter_'+tag+'" >'+tag+'</a></div>');
       }
     });
-    $("a[id^=filter_]").click(function() {
-      $("a[id^=filter_]").css("font-weight", "normal");
+
+    var filters_ = $("a[id^=filter_]");
+
+    filters_.click(function() {
+      filters_.css("font-weight", "normal");
       $(this).css("font-weight", "bold");
 
       var tag = $(this).attr("id").replace("filter_", "");
-      $("div.daily").show();
+
+      dailies.show();
+
       if (tag=="all") {
-        $("div.article").show();
+        articles.show();
 
       } else {
-        $.each($("div.article"), function(id, div) {
+        $.each(articles, function(id, div) {
            div = $(div);
            var spans = div.find("span.rssname");
            div.hide();
@@ -38,17 +46,16 @@
            });
         });
 
-        $.each($("div.daily"), function(id, div) {
+        $.each(dailies, function(id, div) {
           div = $(div);
-          var articles = div.find("div.article:visible");
-          console.debug(articles);
-          if (articles.length == 0) {
+          if (div.find("div.article:visible").length == 0) {
             div.hide();
           }
-
         });
 
       }
+
+      return false;
 
     });
   </script>
